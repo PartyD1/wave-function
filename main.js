@@ -73,14 +73,85 @@ function getEntropy(tileOptions) {
     return Math.log(totalWeight) - weightedLogSum / totalWeight;
 }
 
+function createCell(x, y) {
+    return {
+        x,
+        y,
+        collapsed: false,
+        options: [...TILES],
+    };
+}
+
+function createWaveGrid() {
+    const grid = [];
+
+    for (let y = 0; y < MAP_HEIGHT; y += 1) {
+        const row = [];
+
+        for (let x = 0; x < MAP_WIDTH; x += 1) {
+            row.push(createCell(x, y));
+        }
+
+        grid.push(row);
+    }
+
+    return grid;
+}
+
+function findLowestEntropyCell(grid) {
+    let lowestEntropyCell = null;
+    let lowestEntropy = Infinity;
+
+    for (const row of grid) {
+        for (const cell of row) {
+            if (cell.collapsed) {
+                continue;
+            }
+
+            const entropy = getEntropy(cell.options);
+
+            if (entropy < lowestEntropy) {
+                lowestEntropy = entropy;
+                lowestEntropyCell = cell;
+            }
+        }
+    }
+
+    return lowestEntropyCell;
+}
+
+function collapseCell(cell) {
+    const randomIndex = Math.floor(Math.random() * cell.options.length);
+    const chosenTile = cell.options[randomIndex];
+
+    cell.collapsed = true;
+    cell.options = [chosenTile];
+
+    return chosenTile;
+}
+
+function tilesAreCompatible(tile, otherTile, direction) {
+    return tile.edges[direction.name] === otherTile.edges[direction.opposite];
+}
+
 function preload() {
     this.load.atlasXML("mapPack", "assets/Spritesheet/mapPack_spritesheet.png", "assets/Spritesheet/mapPack_spritesheet.xml");
 }
 
 function create() {
-    console.log("Starting entropy:", getEntropy(TILES));
+    this.waveGrid = createWaveGrid();
+    const lowestEntropyCell = findLowestEntropyCell(this.waveGrid);
+    const chosenTile = collapseCell(lowestEntropyCell);
+    const eastDirection = DIRECTIONS.find((direction) => direction.name === "east");
+    const grassTile = TILES.find((tile) => tile.name === "grass");
 
-    this.add.text(16, 14, "Step 1: tile weights + entropy helper", {
+    console.log("Starting entropy:", getEntropy(TILES));
+    console.log("Sample cell:", this.waveGrid[0][0]);
+    console.log("Lowest entropy cell:", lowestEntropyCell);
+    console.log("Collapsed tile:", chosenTile);
+    console.log("Chosen tile can touch grass to the east:", tilesAreCompatible(chosenTile, grassTile, eastDirection));
+
+    this.add.text(16, 14, "Step 5: tile compatibility helper", {
         fontFamily: "Arial",
         fontSize: "18px",
         color: "#ffffff",
