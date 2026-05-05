@@ -73,14 +73,42 @@ function getEntropy(tileOptions) {
     return Math.log(totalWeight) - weightedLogSum / totalWeight;
 }
 
+function createCell(x, y) {
+    return {
+        x,
+        y,
+        collapsed: false,
+        options: [...TILES],
+    };
+}
+
+function createWaveGrid() {
+    const grid = [];
+
+    for (let y = 0; y < MAP_HEIGHT; y += 1) {
+        const row = [];
+
+        for (let x = 0; x < MAP_WIDTH; x += 1) {
+            row.push(createCell(x, y));
+        }
+
+        grid.push(row);
+    }
+
+    return grid;
+}
+
 function preload() {
     this.load.atlasXML("mapPack", "assets/Spritesheet/mapPack_spritesheet.png", "assets/Spritesheet/mapPack_spritesheet.xml");
 }
 
 function create() {
-    console.log("Starting entropy:", getEntropy(TILES));
+    this.waveGrid = createWaveGrid();
 
-    this.add.text(16, 14, "Step 1: tile weights + entropy helper", {
+    console.log("Starting entropy:", getEntropy(TILES));
+    console.log("Sample cell:", this.waveGrid[0][0]);
+
+    this.add.text(16, 14, "Step 2: cell + wave grid scaffold", {
         fontFamily: "Arial",
         fontSize: "18px",
         color: "#ffffff",
