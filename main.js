@@ -120,6 +120,16 @@ function findLowestEntropyCell(grid) {
     return lowestEntropyCell;
 }
 
+function collapseCell(cell) {
+    const randomIndex = Math.floor(Math.random() * cell.options.length);
+    const chosenTile = cell.options[randomIndex];
+
+    cell.collapsed = true;
+    cell.options = [chosenTile];
+
+    return chosenTile;
+}
+
 function preload() {
     this.load.atlasXML("mapPack", "assets/Spritesheet/mapPack_spritesheet.png", "assets/Spritesheet/mapPack_spritesheet.xml");
 }
@@ -127,12 +137,14 @@ function preload() {
 function create() {
     this.waveGrid = createWaveGrid();
     const lowestEntropyCell = findLowestEntropyCell(this.waveGrid);
+    const chosenTile = collapseCell(lowestEntropyCell);
 
     console.log("Starting entropy:", getEntropy(TILES));
     console.log("Sample cell:", this.waveGrid[0][0]);
     console.log("Lowest entropy cell:", lowestEntropyCell);
+    console.log("Collapsed tile:", chosenTile);
 
-    this.add.text(16, 14, "Step 3: find lowest entropy cell", {
+    this.add.text(16, 14, "Step 4: collapse one cell", {
         fontFamily: "Arial",
         fontSize: "18px",
         color: "#ffffff",
