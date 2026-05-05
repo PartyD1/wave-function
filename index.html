@@ -3,11 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mappy</title>
+    <title>Wave Function Collapse Map</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+    <style>
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            background: #19202a;
+            color: #f5f7fb;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            display: grid;
+            place-items: center;
+        }
+
+        #phaser-game {
+            width: 100%;
+            max-width: 1280px;
+        }
+
+        #description {
+            display: block;
+            width: min(100% - 32px, 1280px);
+            margin: 8px auto 18px;
+            color: #cdd7e3;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
     <script src="main.js"></script>
 </head>
 <body>
     <div id="phaser-game"></div>
-    <span id="description"></span>
+    <span id="description">WFC scaffold. We will add regeneration as we build the algorithm.</span>
 </body>
 </html>
