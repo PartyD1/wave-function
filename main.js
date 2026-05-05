@@ -13,8 +13,10 @@ const config = {
 const game = new Phaser.Game(config);
 
 function preload() {
-    // This is where you will load your Kenney Map Kit assets later
-    // Example: this.load.image('tiles', 'assets/terrain_tiles.png');
+    this.load.spritesheet('tiles', 'assets/tilesheet.png', { 
+        frameWidth: 64, 
+        frameHeight: 64 
+    });
 }
 
 function create() {
