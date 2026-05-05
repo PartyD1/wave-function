@@ -98,17 +98,41 @@ function createWaveGrid() {
     return grid;
 }
 
+function findLowestEntropyCell(grid) {
+    let lowestEntropyCell = null;
+    let lowestEntropy = Infinity;
+
+    for (const row of grid) {
+        for (const cell of row) {
+            if (cell.collapsed) {
+                continue;
+            }
+
+            const entropy = getEntropy(cell.options);
+
+            if (entropy < lowestEntropy) {
+                lowestEntropy = entropy;
+                lowestEntropyCell = cell;
+            }
+        }
+    }
+
+    return lowestEntropyCell;
+}
+
 function preload() {
     this.load.atlasXML("mapPack", "assets/Spritesheet/mapPack_spritesheet.png", "assets/Spritesheet/mapPack_spritesheet.xml");
 }
 
 function create() {
     this.waveGrid = createWaveGrid();
+    const lowestEntropyCell = findLowestEntropyCell(this.waveGrid);
 
     console.log("Starting entropy:", getEntropy(TILES));
     console.log("Sample cell:", this.waveGrid[0][0]);
+    console.log("Lowest entropy cell:", lowestEntropyCell);
 
-    this.add.text(16, 14, "Step 2: cell + wave grid scaffold", {
+    this.add.text(16, 14, "Step 3: find lowest entropy cell", {
         fontFamily: "Arial",
         fontSize: "18px",
         color: "#ffffff",
