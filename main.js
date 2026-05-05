@@ -130,6 +130,10 @@ function collapseCell(cell) {
     return chosenTile;
 }
 
+function tilesAreCompatible(tile, otherTile, direction) {
+    return tile.edges[direction.name] === otherTile.edges[direction.opposite];
+}
+
 function preload() {
     this.load.atlasXML("mapPack", "assets/Spritesheet/mapPack_spritesheet.png", "assets/Spritesheet/mapPack_spritesheet.xml");
 }
@@ -138,13 +142,16 @@ function create() {
     this.waveGrid = createWaveGrid();
     const lowestEntropyCell = findLowestEntropyCell(this.waveGrid);
     const chosenTile = collapseCell(lowestEntropyCell);
+    const eastDirection = DIRECTIONS.find((direction) => direction.name === "east");
+    const grassTile = TILES.find((tile) => tile.name === "grass");
 
     console.log("Starting entropy:", getEntropy(TILES));
     console.log("Sample cell:", this.waveGrid[0][0]);
     console.log("Lowest entropy cell:", lowestEntropyCell);
     console.log("Collapsed tile:", chosenTile);
+    console.log("Chosen tile can touch grass to the east:", tilesAreCompatible(chosenTile, grassTile, eastDirection));
 
-    this.add.text(16, 14, "Step 4: collapse one cell", {
+    this.add.text(16, 14, "Step 5: tile compatibility helper", {
         fontFamily: "Arial",
         fontSize: "18px",
         color: "#ffffff",
