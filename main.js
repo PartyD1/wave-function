@@ -523,8 +523,8 @@ function getCellKey(cell) {
 
 const config = {
     type: Phaser.AUTO,
-    width: 1280,
-    height: 860,
+    width: MAP_WIDTH * TILE_SIZE,
+    height: MAP_HEIGHT * TILE_SIZE,
     parent: "phaser-game",
     backgroundColor: "#19202a",
     pixelArt: true,
