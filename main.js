@@ -120,6 +120,12 @@ function findLowestEntropyCell(grid) {
     return lowestEntropyCell;
 }
 
+function gridIsCollapsed(grid) {
+    return grid.every((row) => {
+        return row.every((cell) => cell.collapsed);
+    });
+}
+
 function pickWeightedTile(tileOptions) {
     const totalWeight = tileOptions.reduce((sum, tile) => sum + tile.weight, 0);
     let roll = Math.random() * totalWeight;
@@ -196,27 +202,48 @@ function propagateFromCell(grid, cell) {
     return true;
 }
 
+function generateCollapsedGrid() {
+    const maxAttempts = 20;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+        const grid = createWaveGrid();
+        let generationFailed = false;
+
+        while (!gridIsCollapsed(grid)) {
+            const cell = findLowestEntropyCell(grid);
+
+            if (!cell) {
+                generationFailed = true;
+                break;
+            }
+
+            collapseCell(cell);
+
+            if (!propagateFromCell(grid, cell)) {
+                generationFailed = true;
+                break;
+            }
+        }
+
+        if (!generationFailed) {
+            return grid;
+        }
+    }
+
+    return createWaveGrid();
+}
+
 function preload() {
     this.load.atlasXML("mapPack", "assets/Spritesheet/mapPack_spritesheet.png", "assets/Spritesheet/mapPack_spritesheet.xml");
 }
 
 function create() {
-    this.waveGrid = createWaveGrid();
-    const lowestEntropyCell = findLowestEntropyCell(this.waveGrid);
-    const chosenTile = collapseCell(lowestEntropyCell);
-    const propagationSucceeded = propagateFromCell(this.waveGrid, lowestEntropyCell);
-    const eastDirection = DIRECTIONS.find((direction) => direction.name === "east");
-    const grassTile = TILES.find((tile) => tile.name === "grass");
+    this.waveGrid = generateCollapsedGrid();
 
     console.log("Starting entropy:", getEntropy(TILES));
-    console.log("Sample cell:", this.waveGrid[0][0]);
-    console.log("Lowest entropy cell:", lowestEntropyCell);
-    console.log("Collapsed tile:", chosenTile);
-    console.log("Chosen tile can touch grass to the east:", tilesAreCompatible(chosenTile, grassTile, eastDirection));
-    console.log("Propagation succeeded:", propagationSucceeded);
-    console.log("East neighbor after propagation:", getNeighborCell(this.waveGrid, lowestEntropyCell, eastDirection));
+    console.log("Generated grid:", this.waveGrid);
 
-    this.add.text(16, 14, "Step 8: weighted tile collapse", {
+    this.add.text(16, 14, "Step 9: full WFC collapse loop", {
         fontFamily: "Arial",
         fontSize: "18px",
         color: "#ffffff",
