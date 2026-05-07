@@ -120,9 +120,23 @@ function findLowestEntropyCell(grid) {
     return lowestEntropyCell;
 }
 
+function pickWeightedTile(tileOptions) {
+    const totalWeight = tileOptions.reduce((sum, tile) => sum + tile.weight, 0);
+    let roll = Math.random() * totalWeight;
+
+    for (const tile of tileOptions) {
+        roll -= tile.weight;
+
+        if (roll <= 0) {
+            return tile;
+        }
+    }
+
+    return tileOptions[tileOptions.length - 1];
+}
+
 function collapseCell(cell) {
-    const randomIndex = Math.floor(Math.random() * cell.options.length);
-    const chosenTile = cell.options[randomIndex];
+    const chosenTile = pickWeightedTile(cell.options);
 
     cell.collapsed = true;
     cell.options = [chosenTile];
@@ -202,7 +216,7 @@ function create() {
     console.log("Propagation succeeded:", propagationSucceeded);
     console.log("East neighbor after propagation:", getNeighborCell(this.waveGrid, lowestEntropyCell, eastDirection));
 
-    this.add.text(16, 14, "Step 7: queue-based propagation", {
+    this.add.text(16, 14, "Step 8: weighted tile collapse", {
         fontFamily: "Arial",
         fontSize: "18px",
         color: "#ffffff",
