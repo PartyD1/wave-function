@@ -49,6 +49,10 @@ const DECORATIONS = [
     { name: "mushroom", frame: "mapTile_103.png", terrains: [TILE_TYPES.GRASS], chance: 0.035 },
 ];
 
+const ROAD_TILES = {
+    HORIZONTAL: "mapTile_127.png",
+};
+
 function terrainTile(name, frame, edges, terrain, weight = 1, rotation = 0) {
     const [north, east, south, west] = edges;
 
@@ -359,6 +363,7 @@ function regenerateMap(scene) {
 
 function drawGeneratedMap(scene, grid) {
     scene.mapLayer.removeAll(true);
+    const roadCells = createRoadPath(grid);
 
     for (const row of grid) {
         for (const cell of row) {
@@ -375,13 +380,15 @@ function drawGeneratedMap(scene, grid) {
                 scene.add.image(pixelX, pixelY, "mapPack", tile.frame).setAngle(tile.rotation)
             );
 
-            const decoration = pickDecorationForTile(tile);
+            const decoration = roadCells.has(getCellKey(cell)) ? null : pickDecorationForTile(tile);
 
             if (decoration) {
                 scene.mapLayer.add(scene.add.image(pixelX, pixelY, "mapPack", decoration.frame).setOrigin(0.5, 0.72));
             }
         }
     }
+
+    drawRoadPath(scene, roadCells);
 }
 
 function pickDecorationForTile(tile) {
@@ -400,6 +407,45 @@ function pickDecorationForTile(tile) {
     }
 
     return null;
+}
+
+function createRoadPath(grid) {
+    const roadY = Math.floor(MAP_HEIGHT / 2);
+    const row = grid[roadY];
+    const landCells = row.filter((cell) => {
+        return cell.options[0].terrain !== TILE_TYPES.WATER;
+    });
+    const roadCells = new Set();
+
+    if (landCells.length === 0) {
+        return roadCells;
+    }
+
+    const startX = landCells[0].x;
+    const endX = landCells[landCells.length - 1].x;
+
+    for (let x = startX; x <= endX; x += 1) {
+        roadCells.add(`${x},${roadY}`);
+    }
+
+    return roadCells;
+}
+
+function drawRoadPath(scene, roadCells) {
+    for (const cellKey of roadCells) {
+        const [x, y] = cellKey.split(",").map(Number);
+
+        scene.mapLayer.add(scene.add.image(
+            x * TILE_SIZE + TILE_SIZE / 2,
+            y * TILE_SIZE + TILE_SIZE / 2,
+            "mapPack",
+            ROAD_TILES.HORIZONTAL
+        ));
+    }
+}
+
+function getCellKey(cell) {
+    return `${cell.x},${cell.y}`;
 }
 
 const config = {
