@@ -41,7 +41,7 @@ const TILES = [
     terrainTile("dirt-grass-nw", "mapTile_066.png", ["grass", "dirt", "dirt", "grass"], TILE_TYPES.DIRT),
 
     // Grass variations (flowers, rocks, different blades)
-    terrainTile("grass-flowers", "mapTile_025.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 0.5),
+    terrainTile("grass-flowers", "mapTile_022.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 0.5),
     //terrainTile("grass-rocks", "mapTile_026.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 0.2),
 
 ];
@@ -359,7 +359,7 @@ function getBaseFrame(tile) {
     }
 
     if (tile.name.includes("dirt-grass")) {
-        return "mapTile_024.png";
+        return "mapTile_022.png";
     }
 
     return null;
