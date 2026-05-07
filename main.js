@@ -73,15 +73,21 @@ function getEntropy(tileOptions) {
     return Math.log(totalWeight) - weightedLogSum / totalWeight;
 }
 
+function randomInteger(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function createTerrainPlan() {
-    const islandLeft = 4;
-    const islandRight = MAP_WIDTH - 5;
-    const islandTop = 3;
-    const islandBottom = MAP_HEIGHT - 4;
-    const dirtLeft = 11;
-    const dirtRight = 17;
-    const dirtTop = 7;
-    const dirtBottom = 12;
+    const islandLeft = randomInteger(3, 5);
+    const islandRight = randomInteger(MAP_WIDTH - 7, MAP_WIDTH - 4);
+    const islandTop = randomInteger(2, 4);
+    const islandBottom = randomInteger(MAP_HEIGHT - 5, MAP_HEIGHT - 3);
+    const dirtWidth = randomInteger(5, 8);
+    const dirtHeight = randomInteger(4, 6);
+    const dirtLeft = randomInteger(islandLeft + 3, islandRight - dirtWidth - 2);
+    const dirtRight = dirtLeft + dirtWidth;
+    const dirtTop = randomInteger(islandTop + 3, islandBottom - dirtHeight - 2);
+    const dirtBottom = dirtTop + dirtHeight;
 
     return Array.from({ length: MAP_HEIGHT }, (_, y) => {
         return Array.from({ length: MAP_WIDTH }, (_, x) => {
