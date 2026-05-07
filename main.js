@@ -238,13 +238,9 @@ function preload() {
 }
 
 function create() {
-    this.waveGrid = generateCollapsedGrid();
     this.mapLayer = this.add.container(0, 0);
 
-    console.log("Starting entropy:", getEntropy(TILES));
-    console.log("Generated grid:", this.waveGrid);
-
-    this.add.text(16, 14, "Step 10: render generated WFC map", {
+    this.add.text(16, 14, "Step 11: press R to regenerate", {
         fontFamily: "Arial",
         fontSize: "18px",
         color: "#ffffff",
@@ -252,7 +248,11 @@ function create() {
         padding: { x: 10, y: 7 },
     }).setDepth(10);
 
-    drawGeneratedMap(this, this.waveGrid);
+    this.input.keyboard.on("keydown-R", () => {
+        regenerateMap(this);
+    });
+
+    regenerateMap(this);
 }
 
 function update() {
@@ -268,6 +268,12 @@ function getBaseFrame(tile) {
     }
 
     return null;
+}
+
+function regenerateMap(scene) {
+    scene.waveGrid = generateCollapsedGrid();
+    drawGeneratedMap(scene, scene.waveGrid);
+    console.log("Generated grid:", scene.waveGrid);
 }
 
 function drawGeneratedMap(scene, grid) {
