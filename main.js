@@ -42,11 +42,11 @@ const TILES = [
 ];
 
 const DECORATIONS = [
-    { name: "pine", frame: "mapTile_060.png", terrains: [TILE_TYPES.GRASS] },
-    { name: "roundTree", frame: "mapTile_071.png", terrains: [TILE_TYPES.GRASS] },
-    { name: "tower", frame: "mapTile_099.png", terrains: [TILE_TYPES.GRASS, TILE_TYPES.DIRT] },
-    { name: "castle", frame: "mapTile_100.png", terrains: [TILE_TYPES.DIRT] },
-    { name: "mushroom", frame: "mapTile_103.png", terrains: [TILE_TYPES.GRASS] },
+    { name: "pine", frame: "mapTile_060.png", terrains: [TILE_TYPES.GRASS], chance: 0.09 },
+    { name: "roundTree", frame: "mapTile_071.png", terrains: [TILE_TYPES.GRASS], chance: 0.05 },
+    { name: "tower", frame: "mapTile_099.png", terrains: [TILE_TYPES.GRASS, TILE_TYPES.DIRT], chance: 0.025 },
+    { name: "castle", frame: "mapTile_100.png", terrains: [TILE_TYPES.DIRT], chance: 0.04 },
+    { name: "mushroom", frame: "mapTile_103.png", terrains: [TILE_TYPES.GRASS], chance: 0.035 },
 ];
 
 function terrainTile(name, frame, edges, terrain, weight = 1, rotation = 0) {
@@ -353,8 +353,32 @@ function drawGeneratedMap(scene, grid) {
             scene.mapLayer.add(
                 scene.add.image(pixelX, pixelY, "mapPack", tile.frame).setAngle(tile.rotation)
             );
+
+            const decoration = pickDecorationForTile(tile);
+
+            if (decoration) {
+                scene.mapLayer.add(scene.add.image(pixelX, pixelY, "mapPack", decoration.frame).setOrigin(0.5, 0.72));
+            }
         }
     }
+}
+
+function pickDecorationForTile(tile) {
+    if (tile.terrain === TILE_TYPES.WATER || tile.name.includes("water") || tile.name.includes("grass-")) {
+        return null;
+    }
+
+    for (const decoration of DECORATIONS) {
+        if (!decoration.terrains.includes(tile.terrain)) {
+            continue;
+        }
+
+        if (Math.random() < decoration.chance) {
+            return decoration;
+        }
+    }
+
+    return null;
 }
 
 const config = {
