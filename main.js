@@ -77,6 +77,7 @@ function createTerrainPlan() {
     const islandRight = randomInteger(MAP_WIDTH - 7, MAP_WIDTH - 4);
     const islandTop = randomInteger(2, 4);
     const islandBottom = randomInteger(MAP_HEIGHT - 5, MAP_HEIGHT - 3);
+    const cornerCut = randomInteger(2, 4);
     const dirtWidth = randomInteger(5, 8);
     const dirtHeight = randomInteger(4, 6);
     const dirtLeft = randomInteger(islandLeft + 3, islandRight - dirtWidth - 2);
@@ -86,7 +87,13 @@ function createTerrainPlan() {
 
     return Array.from({ length: MAP_HEIGHT }, (_, y) => {
         return Array.from({ length: MAP_WIDTH }, (_, x) => {
-            const onIsland = x >= islandLeft && x <= islandRight && y >= islandTop && y <= islandBottom;
+            const insideIslandBox = x >= islandLeft && x <= islandRight && y >= islandTop && y <= islandBottom;
+            const clippedTopLeft = x - islandLeft + y - islandTop < cornerCut;
+            const clippedTopRight = islandRight - x + y - islandTop < cornerCut;
+            const clippedBottomLeft = x - islandLeft + islandBottom - y < cornerCut;
+            const clippedBottomRight = islandRight - x + islandBottom - y < cornerCut;
+            const clippedCorner = clippedTopLeft || clippedTopRight || clippedBottomLeft || clippedBottomRight;
+            const onIsland = insideIslandBox && !clippedCorner;
             const inDirtPatch = x >= dirtLeft && x <= dirtRight && y >= dirtTop && y <= dirtBottom;
 
             if (!onIsland) {
