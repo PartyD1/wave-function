@@ -134,6 +134,33 @@ function tilesAreCompatible(tile, otherTile, direction) {
     return tile.edges[direction.name] === otherTile.edges[direction.opposite];
 }
 
+function getNeighborCell(grid, cell, direction) {
+    const neighborX = cell.x + direction.dx;
+    const neighborY = cell.y + direction.dy;
+
+    if (neighborX < 0 || neighborY < 0 || neighborX >= MAP_WIDTH || neighborY >= MAP_HEIGHT) {
+        return null;
+    }
+
+    return grid[neighborY][neighborX];
+}
+
+function propagateFromCell(grid, cell) {
+    const collapsedTile = cell.options[0];
+
+    for (const direction of DIRECTIONS) {
+        const neighbor = getNeighborCell(grid, cell, direction);
+
+        if (!neighbor || neighbor.collapsed) {
+            continue;
+        }
+
+        neighbor.options = neighbor.options.filter((neighborTile) => {
+            return tilesAreCompatible(collapsedTile, neighborTile, direction);
+        });
+    }
+}
+
 function preload() {
     this.load.atlasXML("mapPack", "assets/Spritesheet/mapPack_spritesheet.png", "assets/Spritesheet/mapPack_spritesheet.xml");
 }
@@ -142,6 +169,7 @@ function create() {
     this.waveGrid = createWaveGrid();
     const lowestEntropyCell = findLowestEntropyCell(this.waveGrid);
     const chosenTile = collapseCell(lowestEntropyCell);
+    propagateFromCell(this.waveGrid, lowestEntropyCell);
     const eastDirection = DIRECTIONS.find((direction) => direction.name === "east");
     const grassTile = TILES.find((tile) => tile.name === "grass");
 
@@ -150,8 +178,9 @@ function create() {
     console.log("Lowest entropy cell:", lowestEntropyCell);
     console.log("Collapsed tile:", chosenTile);
     console.log("Chosen tile can touch grass to the east:", tilesAreCompatible(chosenTile, grassTile, eastDirection));
+    console.log("East neighbor after propagation:", getNeighborCell(this.waveGrid, lowestEntropyCell, eastDirection));
 
-    this.add.text(16, 14, "Step 5: tile compatibility helper", {
+    this.add.text(16, 14, "Step 6: propagate one collapsed cell", {
         fontFamily: "Arial",
         fontSize: "18px",
         color: "#ffffff",
