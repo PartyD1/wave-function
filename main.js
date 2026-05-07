@@ -17,7 +17,7 @@ const TILE_TYPES = {
 
 const TILES = [
     terrainTile("water", "mapTile_188.png", ["water", "water", "water", "water"], TILE_TYPES.WATER, 5),
-    terrainTile("grass", "mapTile_024.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 5),
+    terrainTile("grass", "mapTile_022.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 5),
     terrainTile("dirt", "mapTile_087.png", ["dirt", "dirt", "dirt", "dirt"], TILE_TYPES.DIRT, 2),
 
     terrainTile("grass-water-n", "mapTile_007.png", ["water", "grass", "grass", "grass"], TILE_TYPES.GRASS),
@@ -41,7 +41,7 @@ const TILES = [
     terrainTile("dirt-grass-nw", "mapTile_066.png", ["grass", "dirt", "dirt", "grass"], TILE_TYPES.DIRT),
 
     // Grass variations (flowers, rocks, different blades)
-    terrainTile("grass-flowers", "mapTile_025.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 0.5),
+    terrainTile("grass-flowers", "mapTile_022.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 0.5),
     //terrainTile("grass-rocks", "mapTile_026.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 0.2),
 
     // // Grass-Water Inner Corners (Concave)
@@ -375,7 +375,7 @@ function getBaseFrame(tile) {
     }
 
     if (tile.name.includes("dirt-grass")) {
-        return "mapTile_024.png";
+        return "mapTile_022.png";
     }
 
     return null;
