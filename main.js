@@ -331,13 +331,14 @@ function create() {
         color: "#ffffff",
         backgroundColor: "rgba(0, 0, 0, 0.48)",
         padding: { x: 10, y: 7 },
-    }).setDepth(10);
+    }).setDepth(10).setScrollFactor(0);
 
     this.input.keyboard.on("keydown-R", () => {
         regenerateMap(this);
     });
 
     regenerateMap(this);
+    fitCameraToMap(this);
 }
 
 function update() {
@@ -358,7 +359,19 @@ function getBaseFrame(tile) {
 function regenerateMap(scene) {
     scene.waveGrid = generateCollapsedGrid();
     drawGeneratedMap(scene, scene.waveGrid);
+    fitCameraToMap(scene);
     console.log("Generated grid:", scene.waveGrid);
+}
+
+function fitCameraToMap(scene) {
+    const mapPixelWidth = MAP_WIDTH * TILE_SIZE;
+    const mapPixelHeight = MAP_HEIGHT * TILE_SIZE;
+    const horizontalZoom = (scene.scale.width - 48) / mapPixelWidth;
+    const verticalZoom = (scene.scale.height - 48) / mapPixelHeight;
+    const zoom = Math.min(horizontalZoom, verticalZoom, 1);
+
+    scene.cameras.main.setZoom(zoom);
+    scene.cameras.main.centerOn(mapPixelWidth / 2, mapPixelHeight / 2);
 }
 
 function drawGeneratedMap(scene, grid) {
