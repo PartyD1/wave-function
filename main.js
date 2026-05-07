@@ -39,6 +39,35 @@ const TILES = [
     terrainTile("dirt-grass-se", "mapTile_098.png", ["dirt", "grass", "grass", "dirt"], TILE_TYPES.DIRT, 1, 90),
     terrainTile("dirt-grass-sw", "mapTile_098.png", ["dirt", "dirt", "grass", "grass"], TILE_TYPES.DIRT, 1, 180),
     terrainTile("dirt-grass-nw", "mapTile_098.png", ["grass", "dirt", "dirt", "grass"], TILE_TYPES.DIRT, 1, 270),
+
+    // Inner Corners (Grass-Water)
+    // Frame IDs are estimates—check your mapPack_spritesheet.xml for "inner" tiles
+    terrainTile("grass-water-inner-ne", "mapTile_009.png", ["grass", "grass", "water", "water"], TILE_TYPES.GRASS),
+    terrainTile("grass-water-inner-se", "mapTile_009.png", ["water", "grass", "grass", "water"], TILE_TYPES.GRASS, 1, 90),
+    terrainTile("grass-water-inner-sw", "mapTile_009.png", ["water", "water", "grass", "grass"], TILE_TYPES.GRASS, 1, 180),
+    terrainTile("grass-water-inner-nw", "mapTile_009.png", ["grass", "water", "water", "grass"], TILE_TYPES.GRASS, 1, 270),
+
+    // Dirt-Grass Inner Corners
+    terrainTile("dirt-grass-inner-ne", "mapTile_110.png", ["dirt", "dirt", "grass", "grass"], TILE_TYPES.DIRT),
+    terrainTile("dirt-grass-inner-se", "mapTile_110.png", ["grass", "dirt", "dirt", "grass"], TILE_TYPES.DIRT, 1, 90),
+    terrainTile("dirt-grass-inner-sw", "mapTile_110.png", ["grass", "grass", "dirt", "dirt"], TILE_TYPES.DIRT, 1, 180),
+    terrainTile("dirt-grass-inner-nw", "mapTile_110.png", ["dirt", "grass", "grass", "dirt"], TILE_TYPES.DIRT, 1, 270),
+
+    // Grass variations (flowers, rocks, different blades)
+    terrainTile("grass-flowers", "mapTile_025.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 0.5),
+    terrainTile("grass-rocks", "mapTile_026.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 0.2),
+
+    // Grass-Water Inner Corners (Concave)
+    terrainTile("grass-water-inner-nw", "mapTile_019.png", ["grass", "water", "water", "grass"], TILE_TYPES.GRASS),
+    terrainTile("grass-water-inner-ne", "mapTile_019.png", ["grass", "grass", "water", "water"], TILE_TYPES.GRASS, 1, 90),
+    terrainTile("grass-water-inner-se", "mapTile_019.png", ["water", "grass", "grass", "water"], TILE_TYPES.GRASS, 1, 180),
+    terrainTile("grass-water-inner-sw", "mapTile_019.png", ["water", "water", "grass", "grass"], TILE_TYPES.GRASS, 1, 270),
+
+    // Dirt-Grass Inner Corners (Concave)
+    terrainTile("dirt-grass-inner-nw", "mapTile_109.png", ["dirt", "grass", "grass", "dirt"], TILE_TYPES.DIRT),
+    terrainTile("dirt-grass-inner-ne", "mapTile_109.png", ["dirt", "dirt", "grass", "grass"], TILE_TYPES.DIRT, 1, 90),
+    terrainTile("dirt-grass-inner-se", "mapTile_109.png", ["grass", "dirt", "dirt", "grass"], TILE_TYPES.DIRT, 1, 180),
+    terrainTile("dirt-grass-inner-sw", "mapTile_109.png", ["grass", "grass", "dirt", "dirt"], TILE_TYPES.DIRT, 1, 270),
 ];
 
 const DECORATIONS = [
@@ -51,6 +80,8 @@ const DECORATIONS = [
 
 const ROAD_TILES = {
     HORIZONTAL: "mapTile_127.png",
+    VERTICAL: "mapTile_128.png", // Find the vertical frame
+    CORNER_NE: "mapTile_129.png"  // Find the corner frame
 };
 
 function terrainTile(name, frame, edges, terrain, weight = 1, rotation = 0) {
@@ -410,22 +441,33 @@ function pickDecorationForTile(tile) {
 }
 
 function createRoadPath(grid) {
-    const roadY = Math.floor(MAP_HEIGHT / 2);
-    const row = grid[roadY];
-    const landCells = row.filter((cell) => {
-        return cell.options[0].terrain !== TILE_TYPES.WATER;
-    });
     const roadCells = new Set();
-
-    if (landCells.length === 0) {
-        return roadCells;
+    
+    // Find all DIRT cells to center the road there instead of the middle of the map
+    let dirtCells = [];
+    for (const row of grid) {
+        for (const cell of row) {
+            if (cell.options[0].terrain === TILE_TYPES.DIRT) {
+                dirtCells.push(cell);
+            }
+        }
     }
 
-    const startX = landCells[0].x;
-    const endX = landCells[landCells.length - 1].x;
+    if (dirtCells.length === 0) return roadCells;
 
-    for (let x = startX; x <= endX; x += 1) {
-        roadCells.add(`${x},${roadY}`);
+    // Get the average Y of the dirt patch to place the road
+    const avgY = Math.floor(dirtCells.reduce((sum, c) => sum + c.y, 0) / dirtCells.length);
+    const islandRow = grid[avgY];
+    
+    // Find the start and end of land on this specific row
+    const landOnRow = islandRow.filter(cell => cell.options[0].terrain !== TILE_TYPES.WATER);
+    
+    if (landOnRow.length > 0) {
+        const startX = landOnRow[0].x;
+        const endX = landOnRow[landOnRow.length - 1].x;
+        for (let x = startX; x <= endX; x++) {
+            roadCells.add(`${x},${avgY}`);
+        }
     }
 
     return roadCells;
