@@ -239,11 +239,12 @@ function preload() {
 
 function create() {
     this.waveGrid = generateCollapsedGrid();
+    this.mapLayer = this.add.container(0, 0);
 
     console.log("Starting entropy:", getEntropy(TILES));
     console.log("Generated grid:", this.waveGrid);
 
-    this.add.text(16, 14, "Step 9: full WFC collapse loop", {
+    this.add.text(16, 14, "Step 10: render generated WFC map", {
         fontFamily: "Arial",
         fontSize: "18px",
         color: "#ffffff",
@@ -251,22 +252,40 @@ function create() {
         padding: { x: 10, y: 7 },
     }).setDepth(10);
 
-    drawPlaceholderMap(this);
+    drawGeneratedMap(this, this.waveGrid);
 }
 
 function update() {
 }
 
-function drawPlaceholderMap(scene) {
-    const waterTile = TILES.find((tile) => tile.name === "water");
+function getBaseFrame(tile) {
+    if (tile.name.includes("water")) {
+        return "mapTile_188.png";
+    }
 
-    for (let y = 0; y < MAP_HEIGHT; y += 1) {
-        for (let x = 0; x < MAP_WIDTH; x += 1) {
-            scene.add.image(
-                x * TILE_SIZE + TILE_SIZE / 2,
-                y * TILE_SIZE + TILE_SIZE / 2,
-                "mapPack",
-                waterTile.frame
+    if (tile.name.includes("dirt-grass")) {
+        return "mapTile_024.png";
+    }
+
+    return null;
+}
+
+function drawGeneratedMap(scene, grid) {
+    scene.mapLayer.removeAll(true);
+
+    for (const row of grid) {
+        for (const cell of row) {
+            const tile = cell.options[0];
+            const pixelX = cell.x * TILE_SIZE + TILE_SIZE / 2;
+            const pixelY = cell.y * TILE_SIZE + TILE_SIZE / 2;
+            const baseFrame = getBaseFrame(tile);
+
+            if (baseFrame) {
+                scene.mapLayer.add(scene.add.image(pixelX, pixelY, "mapPack", baseFrame));
+            }
+
+            scene.mapLayer.add(
+                scene.add.image(pixelX, pixelY, "mapPack", tile.frame).setAngle(tile.rotation)
             );
         }
     }
