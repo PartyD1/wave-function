@@ -30,15 +30,15 @@ const TILES = [
     terrainTile("grass-water-sw", "mapTile_008.png", ["grass", "grass", "water", "water"], TILE_TYPES.GRASS, 1, 180),
     terrainTile("grass-water-nw", "mapTile_008.png", ["water", "grass", "grass", "water"], TILE_TYPES.GRASS, 1, 270),
 
-    terrainTile("dirt-grass-n", "mapTile_097.png", ["grass", "dirt", "dirt", "dirt"], TILE_TYPES.DIRT),
-    terrainTile("dirt-grass-e", "mapTile_097.png", ["dirt", "grass", "dirt", "dirt"], TILE_TYPES.DIRT, 1, 90),
-    terrainTile("dirt-grass-s", "mapTile_097.png", ["dirt", "dirt", "grass", "dirt"], TILE_TYPES.DIRT, 1, 180),
-    terrainTile("dirt-grass-w", "mapTile_097.png", ["dirt", "dirt", "dirt", "grass"], TILE_TYPES.DIRT, 1, 270),
+    terrainTile("dirt-grass-n", "mapTile_097.png", ["grass", "dirt", "dirt", "dirt"], TILE_TYPES.DIRT, 1, 180),
+    terrainTile("dirt-grass-e", "mapTile_097.png", ["dirt", "grass", "dirt", "dirt"], TILE_TYPES.DIRT, 1, 270),
+    terrainTile("dirt-grass-s", "mapTile_097.png", ["dirt", "dirt", "grass", "dirt"], TILE_TYPES.DIRT, 1, 0),
+    terrainTile("dirt-grass-w", "mapTile_097.png", ["dirt", "dirt", "dirt", "grass"], TILE_TYPES.DIRT, 1, 90),
 
     terrainTile("dirt-grass-ne", "mapTile_098.png", ["grass", "grass", "dirt", "dirt"], TILE_TYPES.DIRT),
-    terrainTile("dirt-grass-se", "mapTile_098.png", ["dirt", "grass", "grass", "dirt"], TILE_TYPES.DIRT, 1, 90),
-    terrainTile("dirt-grass-sw", "mapTile_098.png", ["dirt", "dirt", "grass", "grass"], TILE_TYPES.DIRT, 1, 180),
-    terrainTile("dirt-grass-nw", "mapTile_098.png", ["grass", "dirt", "dirt", "grass"], TILE_TYPES.DIRT, 1, 270),
+    terrainTile("dirt-grass-se", "mapTile_098.png", ["dirt", "grass", "grass", "dirt"], TILE_TYPES.DIRT),
+    terrainTile("dirt-grass-sw", "mapTile_098.png", ["dirt", "dirt", "grass", "grass"], TILE_TYPES.DIRT),
+    terrainTile("dirt-grass-nw", "mapTile_098.png", ["grass", "dirt", "dirt", "grass"], TILE_TYPES.DIRT),
 
     // Inner Corners (Grass-Water)
     // Frame IDs are estimates—check your mapPack_spritesheet.xml for "inner" tiles
@@ -55,7 +55,7 @@ const TILES = [
 
     // Grass variations (flowers, rocks, different blades)
     terrainTile("grass-flowers", "mapTile_025.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 0.5),
-    terrainTile("grass-rocks", "mapTile_026.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 0.2),
+    //terrainTile("grass-rocks", "mapTile_026.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 0.2),
 
     // Grass-Water Inner Corners (Concave)
     terrainTile("grass-water-inner-nw", "mapTile_019.png", ["grass", "water", "water", "grass"], TILE_TYPES.GRASS),
@@ -72,10 +72,10 @@ const TILES = [
 
 const DECORATIONS = [
     { name: "pine", frame: "mapTile_060.png", terrains: [TILE_TYPES.GRASS], chance: 0.09 },
-    { name: "roundTree", frame: "mapTile_071.png", terrains: [TILE_TYPES.GRASS], chance: 0.05 },
+   // { name: "roundTree", frame: "mapTile_071.png", terrains: [TILE_TYPES.GRASS], chance: 0.05 },
     { name: "tower", frame: "mapTile_099.png", terrains: [TILE_TYPES.GRASS, TILE_TYPES.DIRT], chance: 0.025 },
     { name: "castle", frame: "mapTile_100.png", terrains: [TILE_TYPES.DIRT], chance: 0.04 },
-    { name: "mushroom", frame: "mapTile_103.png", terrains: [TILE_TYPES.GRASS], chance: 0.035 },
+   // { name: "mushroom", frame: "mapTile_103.png", terrains: [TILE_TYPES.GRASS], chance: 0.035 },
 ];
 
 const ROAD_TILES = {
@@ -189,11 +189,19 @@ function createCell(x, y, terrainPlan) {
         return tileFitsTerrainPlan(tile, terrainPlan, x, y);
     });
 
+    // If no tiles fully match the terrain+edge constraints, prefer tiles that at least match the planned terrain.
+    // This prevents completely unrelated corner/dirt tiles from being used as a blind fallback.
+    const plannedTerrain = getPlannedTerrain(terrainPlan, x, y);
+
+    const fallbackOptions = options.length > 0
+        ? options
+        : TILES.filter(tile => tile.terrain === plannedTerrain);
+
     return {
         x,
         y,
         collapsed: false,
-        options: options.length > 0 ? options : [...TILES],
+        options: fallbackOptions.length > 0 ? fallbackOptions : [...TILES],
     };
 }
 
