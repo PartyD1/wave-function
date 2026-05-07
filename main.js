@@ -384,7 +384,7 @@ function drawGeneratedMap(scene, grid) {
                 scene.add.image(pixelX, pixelY, "mapPack", tile.frame).setAngle(tile.rotation)
             );
 
-            const decoration = roadCells.has(getCellKey(cell)) ? null : pickDecorationForTile(tile);
+            const decoration = pickDecorationForCell(cell, roadCells);
 
             if (decoration) {
                 scene.mapLayer.add(scene.add.image(pixelX, pixelY, "mapPack", decoration.frame).setOrigin(0.5, 0.72));
@@ -395,22 +395,41 @@ function drawGeneratedMap(scene, grid) {
     drawRoadPath(scene, roadCells);
 }
 
-function pickDecorationForTile(tile) {
-    if (tile.terrain === TILE_TYPES.WATER || tile.name.includes("water") || tile.name.includes("grass-")) {
+function pickDecorationForCell(cell, roadCells) {
+    const tile = cell.options[0];
+    const cellKey = getCellKey(cell);
+    const nearRoad = isAdjacentToRoad(cell, roadCells);
+
+    if (roadCells.has(cellKey) || tile.terrain === TILE_TYPES.WATER || tile.name.includes("water")) {
         return null;
     }
 
-    for (const decoration of DECORATIONS) {
-        if (!decoration.terrains.includes(tile.terrain)) {
-            continue;
-        }
+    if (nearRoad && tile.terrain === TILE_TYPES.DIRT && Math.random() < 0.12) {
+        return DECORATIONS.find((decoration) => decoration.name === "castle");
+    }
 
-        if (Math.random() < decoration.chance) {
-            return decoration;
-        }
+    if (nearRoad && tile.terrain === TILE_TYPES.GRASS && tile.name === "grass" && Math.random() < 0.07) {
+        return DECORATIONS.find((decoration) => decoration.name === "tower");
+    }
+
+    if (!nearRoad && tile.name === "grass" && Math.random() < 0.16) {
+        return Math.random() < 0.65
+            ? DECORATIONS.find((decoration) => decoration.name === "pine")
+            : DECORATIONS.find((decoration) => decoration.name === "roundTree");
+    }
+
+    if (!nearRoad && tile.name === "grass" && Math.random() < 0.04) {
+        return DECORATIONS.find((decoration) => decoration.name === "mushroom");
     }
 
     return null;
+}
+
+function isAdjacentToRoad(cell, roadCells) {
+    return DIRECTIONS.some((direction) => {
+        const neighborKey = `${cell.x + direction.dx},${cell.y + direction.dy}`;
+        return roadCells.has(neighborKey);
+    });
 }
 
 function createRoadPath(grid) {
