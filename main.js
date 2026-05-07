@@ -40,18 +40,7 @@ const TILES = [
     terrainTile("dirt-grass-sw", "mapTile_098.png", ["dirt", "dirt", "grass", "grass"], TILE_TYPES.DIRT, 1, 180),
     terrainTile("dirt-grass-nw", "mapTile_098.png", ["grass", "dirt", "dirt", "grass"], TILE_TYPES.DIRT, 1, 270),
 
-    // Inner Corners (Grass-Water)
-    // Frame IDs are estimates—check your mapPack_spritesheet.xml for "inner" tiles
-    terrainTile("grass-water-inner-ne", "mapTile_009.png", ["grass", "grass", "water", "water"], TILE_TYPES.GRASS),
-    terrainTile("grass-water-inner-se", "mapTile_009.png", ["water", "grass", "grass", "water"], TILE_TYPES.GRASS, 1, 90),
-    terrainTile("grass-water-inner-sw", "mapTile_009.png", ["water", "water", "grass", "grass"], TILE_TYPES.GRASS, 1, 180),
-    terrainTile("grass-water-inner-nw", "mapTile_009.png", ["grass", "water", "water", "grass"], TILE_TYPES.GRASS, 1, 270),
 
-    // Dirt-Grass Inner Corners
-    terrainTile("dirt-grass-inner-ne", "mapTile_110.png", ["dirt", "dirt", "grass", "grass"], TILE_TYPES.DIRT),
-    terrainTile("dirt-grass-inner-se", "mapTile_110.png", ["grass", "dirt", "dirt", "grass"], TILE_TYPES.DIRT, 1, 90),
-    terrainTile("dirt-grass-inner-sw", "mapTile_110.png", ["grass", "grass", "dirt", "dirt"], TILE_TYPES.DIRT, 1, 180),
-    terrainTile("dirt-grass-inner-nw", "mapTile_110.png", ["dirt", "grass", "grass", "dirt"], TILE_TYPES.DIRT, 1, 270),
 
     // Grass variations (flowers, rocks, different blades)
     terrainTile("grass-flowers", "mapTile_025.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 0.5),
@@ -442,9 +431,9 @@ function pickDecorationForTile(tile) {
 
 function createRoadPath(grid) {
     const roadCells = new Set();
-    
-    // Find all DIRT cells to center the road there instead of the middle of the map
     let dirtCells = [];
+    
+    // Find all dirt cells
     for (const row of grid) {
         for (const cell of row) {
             if (cell.options[0].terrain === TILE_TYPES.DIRT) {
@@ -455,19 +444,36 @@ function createRoadPath(grid) {
 
     if (dirtCells.length === 0) return roadCells;
 
-    // Get the average Y of the dirt patch to place the road
-    const avgY = Math.floor(dirtCells.reduce((sum, c) => sum + c.y, 0) / dirtCells.length);
-    const islandRow = grid[avgY];
+    // Get the boundaries of our dirt patch
+    const minX = Math.min(...dirtCells.map(c => c.x));
+    const maxX = Math.max(...dirtCells.map(c => c.x));
+    const minY = Math.min(...dirtCells.map(c => c.y));
+    const maxY = Math.max(...dirtCells.map(c => c.y));
     
-    // Find the start and end of land on this specific row
-    const landOnRow = islandRow.filter(cell => cell.options[0].terrain !== TILE_TYPES.WATER);
-    
-    if (landOnRow.length > 0) {
-        const startX = landOnRow[0].x;
-        const endX = landOnRow[landOnRow.length - 1].x;
-        for (let x = startX; x <= endX; x++) {
-            roadCells.add(`${x},${avgY}`);
+    // Start in the middle of the left edge of the dirt
+    const startY = Math.floor(dirtCells.reduce((sum, c) => sum + c.y, 0) / dirtCells.length);
+
+    let currX = minX;
+    let currY = startY;
+    roadCells.add(`${currX},${currY}`);
+
+    // Simple Random Walk to the right side
+    while (currX < maxX) {
+        const roll = Math.random();
+        
+        // 50% chance to move Right, 25% Up, 25% Down
+        if (roll < 0.50) {
+            currX++; 
+        } else if (roll < 0.75) {
+            currY--; 
+        } else {
+            currY++; 
         }
+        
+        // Keep the road confined inside the dirt patch vertically
+        currY = Math.max(minY, Math.min(maxY, currY));
+        
+        roadCells.add(`${currX},${currY}`);
     }
 
     return roadCells;
@@ -476,13 +482,32 @@ function createRoadPath(grid) {
 function drawRoadPath(scene, roadCells) {
     for (const cellKey of roadCells) {
         const [x, y] = cellKey.split(",").map(Number);
+        const pixelX = x * TILE_SIZE + TILE_SIZE / 2;
+        const pixelY = y * TILE_SIZE + TILE_SIZE / 2;
 
-        scene.mapLayer.add(scene.add.image(
-            x * TILE_SIZE + TILE_SIZE / 2,
-            y * TILE_SIZE + TILE_SIZE / 2,
-            "mapPack",
-            ROAD_TILES.HORIZONTAL
-        ));
+        // 1. Check which surrounding tiles also have a road
+        const n = roadCells.has(`${x},${y-1}`);
+        const s = roadCells.has(`${x},${y+1}`);
+        const e = roadCells.has(`${x+1},${y}`);
+        const w = roadCells.has(`${x-1},${y}`);
+
+        let frame = ROAD_TILES.HORIZONTAL;
+        let angle = 0;
+
+        // 2. Auto-Tiling Logic: Pick the frame & rotation based on neighbors
+        if (n && s) { frame = ROAD_TILES.VERTICAL; }
+        else if (e && w) { frame = ROAD_TILES.HORIZONTAL; }
+        else if (n && e) { frame = ROAD_TILES.CORNER_NE; angle = 0; }
+        else if (s && e) { frame = ROAD_TILES.CORNER_NE; angle = 90; }
+        else if (s && w) { frame = ROAD_TILES.CORNER_NE; angle = 180; }
+        else if (n && w) { frame = ROAD_TILES.CORNER_NE; angle = 270; }
+        // Fallback for dead ends (start/end points)
+        else if (n || s) { frame = ROAD_TILES.VERTICAL; }
+        else { frame = ROAD_TILES.HORIZONTAL; }
+
+        scene.mapLayer.add(
+            scene.add.image(pixelX, pixelY, "mapPack", frame).setAngle(angle)
+        );
     }
 }
 
