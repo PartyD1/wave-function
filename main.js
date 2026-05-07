@@ -30,31 +30,31 @@ const TILES = [
     terrainTile("grass-water-sw", "mapTile_008.png", ["grass", "grass", "water", "water"], TILE_TYPES.GRASS, 1, 180),
     terrainTile("grass-water-nw", "mapTile_008.png", ["water", "grass", "grass", "water"], TILE_TYPES.GRASS, 1, 270),
 
-    terrainTile("dirt-grass-n", "mapTile_097.png", ["grass", "dirt", "dirt", "dirt"], TILE_TYPES.DIRT, 1, 180),
-    terrainTile("dirt-grass-e", "mapTile_097.png", ["dirt", "grass", "dirt", "dirt"], TILE_TYPES.DIRT, 1, 270),
-    terrainTile("dirt-grass-s", "mapTile_097.png", ["dirt", "dirt", "grass", "dirt"], TILE_TYPES.DIRT, 1, 0),
-    terrainTile("dirt-grass-w", "mapTile_097.png", ["dirt", "dirt", "dirt", "grass"], TILE_TYPES.DIRT, 1, 90),
+    terrainTile("dirt-grass-n", "mapTile_067.png", ["grass", "dirt", "dirt", "dirt"], TILE_TYPES.DIRT),
+    terrainTile("dirt-grass-e", "mapTile_083.png", ["dirt", "grass", "dirt", "dirt"], TILE_TYPES.DIRT),
+    terrainTile("dirt-grass-s", "mapTile_097.png", ["dirt", "dirt", "grass", "dirt"], TILE_TYPES.DIRT),
+    terrainTile("dirt-grass-w", "mapTile_081.png", ["dirt", "dirt", "dirt", "grass"], TILE_TYPES.DIRT),
 
-    terrainTile("dirt-grass-ne", "mapTile_098.png", ["grass", "grass", "dirt", "dirt"], TILE_TYPES.DIRT),
-    terrainTile("dirt-grass-se", "mapTile_098.png", ["dirt", "grass", "grass", "dirt"], TILE_TYPES.DIRT, 1, 90),
-    terrainTile("dirt-grass-sw", "mapTile_098.png", ["dirt", "dirt", "grass", "grass"], TILE_TYPES.DIRT, 1, 180),
-    terrainTile("dirt-grass-nw", "mapTile_098.png", ["grass", "dirt", "dirt", "grass"], TILE_TYPES.DIRT, 1, 270),
+    terrainTile("dirt-grass-ne", "mapTile_068.png", ["grass", "grass", "dirt", "dirt"], TILE_TYPES.DIRT),
+    terrainTile("dirt-grass-se", "mapTile_098.png", ["dirt", "grass", "grass", "dirt"], TILE_TYPES.DIRT),
+    terrainTile("dirt-grass-sw", "mapTile_096.png", ["dirt", "dirt", "grass", "grass"], TILE_TYPES.DIRT),
+    terrainTile("dirt-grass-nw", "mapTile_066.png", ["grass", "dirt", "dirt", "grass"], TILE_TYPES.DIRT),
 
     // Grass variations (flowers, rocks, different blades)
     terrainTile("grass-flowers", "mapTile_025.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 0.5),
     //terrainTile("grass-rocks", "mapTile_026.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 0.2),
 
-    // Grass-Water Inner Corners (Concave)
-    terrainTile("grass-water-inner-nw", "mapTile_019.png", ["grass", "water", "water", "grass"], TILE_TYPES.GRASS),
-    terrainTile("grass-water-inner-ne", "mapTile_019.png", ["grass", "grass", "water", "water"], TILE_TYPES.GRASS, 1, 90),
-    terrainTile("grass-water-inner-se", "mapTile_019.png", ["water", "grass", "grass", "water"], TILE_TYPES.GRASS, 1, 180),
-    terrainTile("grass-water-inner-sw", "mapTile_019.png", ["water", "water", "grass", "grass"], TILE_TYPES.GRASS, 1, 270),
+    // // Grass-Water Inner Corners (Concave)
+    // terrainTile("grass-water-inner-nw", "mapTile_019.png", ["grass", "water", "water", "grass"], TILE_TYPES.GRASS),
+    // terrainTile("grass-water-inner-ne", "mapTile_019.png", ["grass", "grass", "water", "water"], TILE_TYPES.GRASS, 1, 90),
+    // terrainTile("grass-water-inner-se", "mapTile_019.png", ["water", "grass", "grass", "water"], TILE_TYPES.GRASS, 1, 180),
+    // terrainTile("grass-water-inner-sw", "mapTile_019.png", ["water", "water", "grass", "grass"], TILE_TYPES.GRASS, 1, 270),
 
     // Dirt-Grass Inner Corners (Concave)
-    terrainTile("dirt-grass-inner-nw", "mapTile_109.png", ["dirt", "grass", "grass", "dirt"], TILE_TYPES.DIRT),
-    terrainTile("dirt-grass-inner-ne", "mapTile_109.png", ["dirt", "dirt", "grass", "grass"], TILE_TYPES.DIRT, 1, 90),
-    terrainTile("dirt-grass-inner-se", "mapTile_109.png", ["grass", "dirt", "dirt", "grass"], TILE_TYPES.DIRT, 1, 180),
-    terrainTile("dirt-grass-inner-sw", "mapTile_109.png", ["grass", "grass", "dirt", "dirt"], TILE_TYPES.DIRT, 1, 270),
+    // terrainTile("dirt-grass-inner-nw", "mapTile_066.png", ["dirt", "grass", "grass", "dirt"], TILE_TYPES.DIRT),
+    // terrainTile("dirt-grass-inner-ne", "mapTile_066.png", ["dirt", "dirt", "grass", "grass"], TILE_TYPES.DIRT),
+    // terrainTile("dirt-grass-inner-se", "mapTile_066.png", ["grass", "dirt", "dirt", "grass"], TILE_TYPES.DIRT),
+    // terrainTile("dirt-grass-inner-sw", "mapTile_066.png", ["grass", "grass", "dirt", "dirt"], TILE_TYPES.DIRT),
 ];
 
 const DECORATIONS = [
@@ -65,11 +65,11 @@ const DECORATIONS = [
     { name: "pyramid", frame: "mapTile_050.png", terrains: [TILE_TYPES.GRASS], chance: 0.035 },
 ];  
 
-const ROAD_TILES = {
-    HORIZONTAL: "mapTile_127.png",
-    VERTICAL: "mapTile_128.png", // Find the vertical frame
-    CORNER_NE: "mapTile_129.png"  // Find the corner frame
-};
+// const ROAD_TILES = {
+//     HORIZONTAL: "mapTile_127.png",
+//     VERTICAL: "mapTile_128.png", // Find the vertical frame
+//     CORNER_NE: "mapTile_129.png"  // Find the corner frame
+// };
 
 function terrainTile(name, frame, edges, terrain, weight = 1, rotation = 0) {
     const [north, east, south, west] = edges;
