@@ -74,27 +74,25 @@ function getEntropy(tileOptions) {
 }
 
 function createTerrainPlan() {
-    const centerX = (MAP_WIDTH - 1) / 2;
-    const centerY = (MAP_HEIGHT - 1) / 2;
-    const islandRadiusX = MAP_WIDTH * 0.42;
-    const islandRadiusY = MAP_HEIGHT * 0.38;
-    const dirtCenterX = MAP_WIDTH * 0.58;
-    const dirtCenterY = MAP_HEIGHT * 0.52;
+    const islandLeft = 4;
+    const islandRight = MAP_WIDTH - 5;
+    const islandTop = 3;
+    const islandBottom = MAP_HEIGHT - 4;
+    const dirtLeft = 11;
+    const dirtRight = 17;
+    const dirtTop = 7;
+    const dirtBottom = 12;
 
     return Array.from({ length: MAP_HEIGHT }, (_, y) => {
         return Array.from({ length: MAP_WIDTH }, (_, x) => {
-            const islandDistance =
-                ((x - centerX) / islandRadiusX) ** 2 +
-                ((y - centerY) / islandRadiusY) ** 2;
-            const dirtDistance =
-                ((x - dirtCenterX) / 4.5) ** 2 +
-                ((y - dirtCenterY) / 3.2) ** 2;
+            const onIsland = x >= islandLeft && x <= islandRight && y >= islandTop && y <= islandBottom;
+            const inDirtPatch = x >= dirtLeft && x <= dirtRight && y >= dirtTop && y <= dirtBottom;
 
-            if (islandDistance > 1) {
+            if (!onIsland) {
                 return TILE_TYPES.WATER;
             }
 
-            if (dirtDistance < 1) {
+            if (inDirtPatch) {
                 return TILE_TYPES.DIRT;
             }
 
@@ -111,6 +109,22 @@ function getPlannedTerrain(plan, x, y) {
     return plan[y][x];
 }
 
+function getExpectedEdgeTerrain(plannedTerrain, neighborTerrain) {
+    if (plannedTerrain === TILE_TYPES.WATER) {
+        return TILE_TYPES.WATER;
+    }
+
+    if (plannedTerrain === TILE_TYPES.GRASS) {
+        return neighborTerrain === TILE_TYPES.WATER ? TILE_TYPES.WATER : TILE_TYPES.GRASS;
+    }
+
+    if (plannedTerrain === TILE_TYPES.DIRT) {
+        return neighborTerrain === TILE_TYPES.DIRT ? TILE_TYPES.DIRT : TILE_TYPES.GRASS;
+    }
+
+    return plannedTerrain;
+}
+
 function tileFitsTerrainPlan(tile, plan, x, y) {
     const plannedTerrain = getPlannedTerrain(plan, x, y);
 
@@ -124,7 +138,8 @@ function tileFitsTerrainPlan(tile, plan, x, y) {
 
     return DIRECTIONS.every((direction) => {
         const neighborTerrain = getPlannedTerrain(plan, x + direction.dx, y + direction.dy);
-        return tile.edges[direction.name] === neighborTerrain;
+        const expectedEdgeTerrain = getExpectedEdgeTerrain(plannedTerrain, neighborTerrain);
+        return tile.edges[direction.name] === expectedEdgeTerrain;
     });
 }
 
