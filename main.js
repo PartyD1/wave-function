@@ -17,7 +17,7 @@ const TILE_TYPES = {
 
 const TILES = [
     terrainTile("water", "mapTile_188.png", ["water", "water", "water", "water"], TILE_TYPES.WATER, 5),
-    terrainTile("grass", "mapTile_024.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 5),
+    terrainTile("grass", "mapTile_022.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 5),
     terrainTile("dirt", "mapTile_087.png", ["dirt", "dirt", "dirt", "dirt"], TILE_TYPES.DIRT, 2),
 
     terrainTile("grass-water-n", "mapTile_007.png", ["water", "grass", "grass", "grass"], TILE_TYPES.GRASS),
@@ -44,17 +44,6 @@ const TILES = [
     terrainTile("grass-flowers", "mapTile_025.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 0.5),
     //terrainTile("grass-rocks", "mapTile_026.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 0.2),
 
-    // // Grass-Water Inner Corners (Concave)
-    // terrainTile("grass-water-inner-nw", "mapTile_019.png", ["grass", "water", "water", "grass"], TILE_TYPES.GRASS),
-    // terrainTile("grass-water-inner-ne", "mapTile_019.png", ["grass", "grass", "water", "water"], TILE_TYPES.GRASS, 1, 90),
-    // terrainTile("grass-water-inner-se", "mapTile_019.png", ["water", "grass", "grass", "water"], TILE_TYPES.GRASS, 1, 180),
-    // terrainTile("grass-water-inner-sw", "mapTile_019.png", ["water", "water", "grass", "grass"], TILE_TYPES.GRASS, 1, 270),
-
-    // Dirt-Grass Inner Corners (Concave)
-    // terrainTile("dirt-grass-inner-nw", "mapTile_066.png", ["dirt", "grass", "grass", "dirt"], TILE_TYPES.DIRT),
-    // terrainTile("dirt-grass-inner-ne", "mapTile_066.png", ["dirt", "dirt", "grass", "grass"], TILE_TYPES.DIRT),
-    // terrainTile("dirt-grass-inner-se", "mapTile_066.png", ["grass", "dirt", "dirt", "grass"], TILE_TYPES.DIRT),
-    // terrainTile("dirt-grass-inner-sw", "mapTile_066.png", ["grass", "grass", "dirt", "dirt"], TILE_TYPES.DIRT),
 ];
 
 const DECORATIONS = [
@@ -65,11 +54,6 @@ const DECORATIONS = [
     { name: "pyramid", frame: "mapTile_050.png", terrains: [TILE_TYPES.GRASS], chance: 0.035 },
 ];  
 
-// const ROAD_TILES = {
-//     HORIZONTAL: "mapTile_127.png",
-//     VERTICAL: "mapTile_128.png", // Find the vertical frame
-//     CORNER_NE: "mapTile_129.png"  // Find the corner frame
-// };
 
 function terrainTile(name, frame, edges, terrain, weight = 1, rotation = 0) {
     const [north, east, south, west] = edges;
