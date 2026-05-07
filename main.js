@@ -18,7 +18,7 @@ const TILE_TYPES = {
 const TILES = [
     terrainTile("water", "mapTile_188.png", ["water", "water", "water", "water"], TILE_TYPES.WATER, 5),
     terrainTile("grass", "mapTile_024.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 5),
-    terrainTile("dirt", "mapTile_087.png", ["dirt", "dirt", "dirt", "dirt"], TILE_TYPES.DIRT, 2),
+    terrainTile("dirt", "mapTile_087.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.DIRT, 2),
 
     terrainTile("grass-water-n", "mapTile_007.png", ["water", "grass", "grass", "grass"], TILE_TYPES.GRASS),
     terrainTile("grass-water-e", "mapTile_007.png", ["grass", "water", "grass", "grass"], TILE_TYPES.GRASS, 1, 90),
@@ -30,15 +30,6 @@ const TILES = [
     terrainTile("grass-water-sw", "mapTile_008.png", ["grass", "grass", "water", "water"], TILE_TYPES.GRASS, 1, 180),
     terrainTile("grass-water-nw", "mapTile_008.png", ["water", "grass", "grass", "water"], TILE_TYPES.GRASS, 1, 270),
 
-    terrainTile("dirt-grass-n", "mapTile_097.png", ["grass", "dirt", "dirt", "dirt"], TILE_TYPES.DIRT),
-    terrainTile("dirt-grass-e", "mapTile_097.png", ["dirt", "grass", "dirt", "dirt"], TILE_TYPES.DIRT, 1, 90),
-    terrainTile("dirt-grass-s", "mapTile_097.png", ["dirt", "dirt", "grass", "dirt"], TILE_TYPES.DIRT, 1, 180),
-    terrainTile("dirt-grass-w", "mapTile_097.png", ["dirt", "dirt", "dirt", "grass"], TILE_TYPES.DIRT, 1, 270),
-
-    terrainTile("dirt-grass-ne", "mapTile_098.png", ["grass", "grass", "dirt", "dirt"], TILE_TYPES.DIRT),
-    terrainTile("dirt-grass-se", "mapTile_098.png", ["dirt", "grass", "grass", "dirt"], TILE_TYPES.DIRT, 1, 90),
-    terrainTile("dirt-grass-sw", "mapTile_098.png", ["dirt", "dirt", "grass", "grass"], TILE_TYPES.DIRT, 1, 180),
-    terrainTile("dirt-grass-nw", "mapTile_098.png", ["grass", "dirt", "dirt", "grass"], TILE_TYPES.DIRT, 1, 270),
 ];
 
 const DECORATIONS = [
@@ -129,7 +120,7 @@ function getExpectedEdgeTerrain(plannedTerrain, neighborTerrain) {
     }
 
     if (plannedTerrain === TILE_TYPES.DIRT) {
-        return neighborTerrain === TILE_TYPES.DIRT ? TILE_TYPES.DIRT : TILE_TYPES.GRASS;
+        return TILE_TYPES.GRASS;
     }
 
     return plannedTerrain;
