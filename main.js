@@ -73,23 +73,83 @@ function getEntropy(tileOptions) {
     return Math.log(totalWeight) - weightedLogSum / totalWeight;
 }
 
-function createCell(x, y) {
+function createTerrainPlan() {
+    const centerX = (MAP_WIDTH - 1) / 2;
+    const centerY = (MAP_HEIGHT - 1) / 2;
+    const islandRadiusX = MAP_WIDTH * 0.42;
+    const islandRadiusY = MAP_HEIGHT * 0.38;
+    const dirtCenterX = MAP_WIDTH * 0.58;
+    const dirtCenterY = MAP_HEIGHT * 0.52;
+
+    return Array.from({ length: MAP_HEIGHT }, (_, y) => {
+        return Array.from({ length: MAP_WIDTH }, (_, x) => {
+            const islandDistance =
+                ((x - centerX) / islandRadiusX) ** 2 +
+                ((y - centerY) / islandRadiusY) ** 2;
+            const dirtDistance =
+                ((x - dirtCenterX) / 4.5) ** 2 +
+                ((y - dirtCenterY) / 3.2) ** 2;
+
+            if (islandDistance > 1) {
+                return TILE_TYPES.WATER;
+            }
+
+            if (dirtDistance < 1) {
+                return TILE_TYPES.DIRT;
+            }
+
+            return TILE_TYPES.GRASS;
+        });
+    });
+}
+
+function getPlannedTerrain(plan, x, y) {
+    if (x < 0 || y < 0 || x >= MAP_WIDTH || y >= MAP_HEIGHT) {
+        return TILE_TYPES.WATER;
+    }
+
+    return plan[y][x];
+}
+
+function tileFitsTerrainPlan(tile, plan, x, y) {
+    const plannedTerrain = getPlannedTerrain(plan, x, y);
+
+    if (plannedTerrain === TILE_TYPES.WATER) {
+        return tile.terrain === TILE_TYPES.WATER;
+    }
+
+    if (tile.terrain !== plannedTerrain) {
+        return false;
+    }
+
+    return DIRECTIONS.every((direction) => {
+        const neighborTerrain = getPlannedTerrain(plan, x + direction.dx, y + direction.dy);
+        return tile.edges[direction.name] === neighborTerrain;
+    });
+}
+
+function createCell(x, y, terrainPlan) {
+    const options = TILES.filter((tile) => {
+        return tileFitsTerrainPlan(tile, terrainPlan, x, y);
+    });
+
     return {
         x,
         y,
         collapsed: false,
-        options: [...TILES],
+        options: options.length > 0 ? options : [...TILES],
     };
 }
 
 function createWaveGrid() {
+    const terrainPlan = createTerrainPlan();
     const grid = [];
 
     for (let y = 0; y < MAP_HEIGHT; y += 1) {
         const row = [];
 
         for (let x = 0; x < MAP_WIDTH; x += 1) {
-            row.push(createCell(x, y));
+            row.push(createCell(x, y, terrainPlan));
         }
 
         grid.push(row);
@@ -240,7 +300,7 @@ function preload() {
 function create() {
     this.mapLayer = this.add.container(0, 0);
 
-    this.add.text(16, 14, "Step 11: press R to regenerate", {
+    this.add.text(16, 14, "WFC map | R regenerates", {
         fontFamily: "Arial",
         fontSize: "18px",
         color: "#ffffff",
