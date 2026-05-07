@@ -40,8 +40,6 @@ const TILES = [
     terrainTile("dirt-grass-sw", "mapTile_098.png", ["dirt", "dirt", "grass", "grass"], TILE_TYPES.DIRT, 1, 180),
     terrainTile("dirt-grass-nw", "mapTile_098.png", ["grass", "dirt", "dirt", "grass"], TILE_TYPES.DIRT, 1, 270),
 
-
-
     // Grass variations (flowers, rocks, different blades)
     terrainTile("grass-flowers", "mapTile_025.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 0.5),
     terrainTile("grass-rocks", "mapTile_026.png", ["grass", "grass", "grass", "grass"], TILE_TYPES.GRASS, 0.2),
@@ -61,11 +59,11 @@ const TILES = [
 
 const DECORATIONS = [
     { name: "pine", frame: "mapTile_060.png", terrains: [TILE_TYPES.GRASS], chance: 0.09 },
-    { name: "roundTree", frame: "mapTile_071.png", terrains: [TILE_TYPES.GRASS], chance: 0.05 },
+    { name: "cactus", frame: "mapTile_035.png", terrains: [TILE_TYPES.GRASS], chance: 0.05 },
     { name: "tower", frame: "mapTile_099.png", terrains: [TILE_TYPES.GRASS, TILE_TYPES.DIRT], chance: 0.025 },
     { name: "castle", frame: "mapTile_100.png", terrains: [TILE_TYPES.DIRT], chance: 0.04 },
-    { name: "mushroom", frame: "mapTile_103.png", terrains: [TILE_TYPES.GRASS], chance: 0.035 },
-];
+    { name: "pyramid", frame: "mapTile_050.png", terrains: [TILE_TYPES.GRASS], chance: 0.035 },
+];  
 
 const ROAD_TILES = {
     HORIZONTAL: "mapTile_127.png",
