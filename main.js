@@ -94,13 +94,38 @@ function createTerrainPlan() {
     const dirtRight = dirtLeft + dirtWidth;
     const dirtTop = randomInteger(islandTop + 3, islandBottom - dirtHeight - 2);
     const dirtBottom = dirtTop + dirtHeight;
+    const lakeRadiusX = randomInteger(1, 2);
+    const lakeRadiusY = 1;
+    let lakeCenterX = randomInteger(islandLeft + lakeRadiusX + 1, islandRight - lakeRadiusX - 1);
+    let lakeCenterY = randomInteger(islandTop + lakeRadiusY + 1, islandBottom - lakeRadiusY - 1);
+
+    for (let attempt = 0; attempt < 12; attempt += 1) {
+        const lakeTouchesDirt = lakeCenterX + lakeRadiusX >= dirtLeft - 1
+            && lakeCenterX - lakeRadiusX <= dirtRight + 1
+            && lakeCenterY + lakeRadiusY >= dirtTop - 1
+            && lakeCenterY - lakeRadiusY <= dirtBottom + 1;
+
+        if (!lakeTouchesDirt) {
+            break;
+        }
+
+        lakeCenterX = randomInteger(islandLeft + lakeRadiusX + 1, islandRight - lakeRadiusX - 1);
+        lakeCenterY = randomInteger(islandTop + lakeRadiusY + 1, islandBottom - lakeRadiusY - 1);
+    }
 
     return Array.from({ length: MAP_HEIGHT }, (_, y) => {
         return Array.from({ length: MAP_WIDTH }, (_, x) => {
             const onIsland = x >= islandLeft && x <= islandRight && y >= islandTop && y <= islandBottom;
             const inDirtPatch = x >= dirtLeft && x <= dirtRight && y >= dirtTop && y <= dirtBottom;
+            const lakeShape = ((x - lakeCenterX) ** 2) / ((lakeRadiusX + 0.35) ** 2)
+                + ((y - lakeCenterY) ** 2) / ((lakeRadiusY + 0.35) ** 2);
+            const inLake = lakeShape <= 1;
 
             if (!onIsland) {
+                return TILE_TYPES.WATER;
+            }
+
+            if (inLake) {
                 return TILE_TYPES.WATER;
             }
 
