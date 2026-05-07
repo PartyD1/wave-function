@@ -51,7 +51,6 @@ const DECORATIONS = [
     { name: "cactus", frame: "mapTile_035.png", terrains: [TILE_TYPES.GRASS], chance: 0.05 },
     { name: "tower", frame: "mapTile_099.png", terrains: [TILE_TYPES.GRASS, TILE_TYPES.DIRT], chance: 0.025 },
     { name: "castle", frame: "mapTile_100.png", terrains: [TILE_TYPES.DIRT], chance: 0.04 },
-    { name: "pyramid", frame: "mapTile_050.png", terrains: [TILE_TYPES.GRASS], chance: 0.035 },
 ];  
 
 
