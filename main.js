@@ -145,20 +145,41 @@ function getNeighborCell(grid, cell, direction) {
     return grid[neighborY][neighborX];
 }
 
-function propagateFromCell(grid, cell) {
-    const collapsedTile = cell.options[0];
-
-    for (const direction of DIRECTIONS) {
-        const neighbor = getNeighborCell(grid, cell, direction);
-
-        if (!neighbor || neighbor.collapsed) {
-            continue;
-        }
-
-        neighbor.options = neighbor.options.filter((neighborTile) => {
-            return tilesAreCompatible(collapsedTile, neighborTile, direction);
+function getCompatibleOptions(sourceOptions, neighborOptions, direction) {
+    return neighborOptions.filter((neighborTile) => {
+        return sourceOptions.some((sourceTile) => {
+            return tilesAreCompatible(sourceTile, neighborTile, direction);
         });
+    });
+}
+
+function propagateFromCell(grid, cell) {
+    const queue = [cell];
+
+    while (queue.length > 0) {
+        const currentCell = queue.shift();
+
+        for (const direction of DIRECTIONS) {
+            const neighbor = getNeighborCell(grid, currentCell, direction);
+
+            if (!neighbor || neighbor.collapsed) {
+                continue;
+            }
+
+            const nextOptions = getCompatibleOptions(currentCell.options, neighbor.options, direction);
+
+            if (nextOptions.length === 0) {
+                return false;
+            }
+
+            if (nextOptions.length < neighbor.options.length) {
+                neighbor.options = nextOptions;
+                queue.push(neighbor);
+            }
+        }
     }
+
+    return true;
 }
 
 function preload() {
@@ -169,7 +190,7 @@ function create() {
     this.waveGrid = createWaveGrid();
     const lowestEntropyCell = findLowestEntropyCell(this.waveGrid);
     const chosenTile = collapseCell(lowestEntropyCell);
-    propagateFromCell(this.waveGrid, lowestEntropyCell);
+    const propagationSucceeded = propagateFromCell(this.waveGrid, lowestEntropyCell);
     const eastDirection = DIRECTIONS.find((direction) => direction.name === "east");
     const grassTile = TILES.find((tile) => tile.name === "grass");
 
@@ -178,9 +199,10 @@ function create() {
     console.log("Lowest entropy cell:", lowestEntropyCell);
     console.log("Collapsed tile:", chosenTile);
     console.log("Chosen tile can touch grass to the east:", tilesAreCompatible(chosenTile, grassTile, eastDirection));
+    console.log("Propagation succeeded:", propagationSucceeded);
     console.log("East neighbor after propagation:", getNeighborCell(this.waveGrid, lowestEntropyCell, eastDirection));
 
-    this.add.text(16, 14, "Step 6: propagate one collapsed cell", {
+    this.add.text(16, 14, "Step 7: queue-based propagation", {
         fontFamily: "Arial",
         fontSize: "18px",
         color: "#ffffff",
